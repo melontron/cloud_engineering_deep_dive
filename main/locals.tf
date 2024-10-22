@@ -17,6 +17,9 @@ locals {
   main_vpc_cidr       = module.network_secret_ro.secret_map["vpc_cidr"]
   main_vpn_cidr       = "10.20.0.0/24" # Need to be changed in the openvpn-setup.sh as well
   main_vpc_space_cidr = module.network_secret_ro.secret_map["vpc_space_cidr"]
+  github_app_id       = module.network_secret_ro.secret_map["github_app_id"]
+  github_app_key      = base64decode(module.network_secret_ro.secret_map["github_app_key"])
+  github_webhook_secret = module.network_secret_ro.secret_map["github_webhook_secret"]
 
   # Core Component Configurations.
   core_workspaces = jsondecode(module.network_secret_ro.secret_map["core_workspaces"])

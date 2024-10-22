@@ -76,3 +76,5 @@ main/terraform.rc
 .env
 
 main/pub_keys/*
+.DS_Store
+main/src/build/*

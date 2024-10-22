@@ -34,3 +34,7 @@ terraform.rc
 .env
 
 pub_keys/*
+.DS_Store
+../.DS_Store
+../*/.DS_Store
+./src/build/*
