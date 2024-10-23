@@ -48,4 +48,3 @@ resource "aws_key_pair" "github_runner_key" {
   key_name   = "${local.prefix}-github-runner-key"
   public_key = local.github_public_key
 }
-
