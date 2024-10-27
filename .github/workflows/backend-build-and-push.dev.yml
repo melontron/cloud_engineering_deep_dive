@@ -28,8 +28,8 @@ jobs:
     - name: Get branch name
       id: branch-name
       run: |
-        if [[ $GITHUB_HEAD_REF ]]; then
-          echo "BRANCH_NAME=$GITHUB_HEAD_REF" >> $GITHUB_ENV
+        if [[ $GITHUB_BASE_REF ]]; then
+          echo "BRANCH_NAME=$GITHUB_BASE_REF" >> $GITHUB_ENV
         else
           echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
         fi
