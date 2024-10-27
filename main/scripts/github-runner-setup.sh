@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Update and install necessary packages
-sudo apt-get update -y
-sudo apt-get install -y curl jq unzip nodejs
+sudo yum update -y
+sudo yum install -y curl jq unzip
 
 # Variables from Terraform
 GITHUB_TOKEN="${github_token}"
@@ -11,7 +11,7 @@ REPO_URL="${repo_url}"
 RUNNER_VERSION="2.311.0"
 
 # Create a runner directory in the ubuntu user's home and navigate into it
-mkdir -p /home/ubuntu/actions-runner && cd /home/ubuntu/actions-runner
+mkdir -p /home/Aramayis/runners/actions-runner && cd /home/Aramayis/runners/actions-runner
 
 # Download the latest runner package
 curl -o actions-runner-linux-x64-$RUNNER_VERSION.tar.gz -L https://github.com/actions/runner/releases/download/v$RUNNER_VERSION/actions-runner-linux-x64-$RUNNER_VERSION.tar.gz
@@ -20,7 +20,7 @@ curl -o actions-runner-linux-x64-$RUNNER_VERSION.tar.gz -L https://github.com/ac
 tar xzf ./actions-runner-linux-x64-$RUNNER_VERSION.tar.gz
 
 # Set the correct ownership
-sudo chown -R Aramayis:Aramayis /home/ubuntu/actions-runner
+sudo chown -R ubuntu:ubuntu /home/ubuntu/actions-runner
 
 # Switch to the ubuntu user to configure the runner
 sudo -u Aramayis bash << EOF
