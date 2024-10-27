@@ -20,10 +20,10 @@ curl -o actions-runner-linux-x64-$RUNNER_VERSION.tar.gz -L https://github.com/ac
 tar xzf ./actions-runner-linux-x64-$RUNNER_VERSION.tar.gz
 
 # Set the correct ownership
-sudo chown -R ubuntu:ubuntu /home/ubuntu/actions-runner
+sudo chown -R Aramayis:Aramayis /home/ubuntu/actions-runner
 
 # Switch to the ubuntu user to configure the runner
-sudo -u ubuntu bash << EOF
+sudo -u Aramayis bash << EOF
 # Configure the runner
 ./config.sh --url "$REPO_URL" --token "$GITHUB_TOKEN" --labels "$RUNNER_LABEL" --unattended --replace
 EOF
