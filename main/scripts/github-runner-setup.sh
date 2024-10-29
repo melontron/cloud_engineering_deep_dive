@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Update and install necessary packages
-sudo yum update -y
-sudo yum install -y curl jq unzip
+sudo apt-get update -y
+sudo apt-get install -y curl jq unzip nodejs
 
 # Variables from Terraform
 GITHUB_TOKEN="${github_token}"
@@ -11,7 +11,7 @@ REPO_URL="${repo_url}"
 RUNNER_VERSION="2.311.0"
 
 # Create a runner directory in the ubuntu user's home and navigate into it
-mkdir -p /home/Aramayis/runners/actions-runner && cd /home/Aramayis/runners/actions-runner
+mkdir -p /home/ubuntu/actions-runner && cd /home/ubuntu/actions-runner
 
 # Download the latest runner package
 curl -o actions-runner-linux-x64-$RUNNER_VERSION.tar.gz -L https://github.com/actions/runner/releases/download/v$RUNNER_VERSION/actions-runner-linux-x64-$RUNNER_VERSION.tar.gz
