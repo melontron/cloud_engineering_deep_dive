@@ -13,7 +13,8 @@ jobs:
     permissions:
       id-token: write
       contents: read
-
+    outputs:
+      branch_name: ${{ env.BRANCH_NAME }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -56,23 +57,30 @@ jobs:
       run: |
         docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     
+    steps:
     - name: Update ECS service
       if: env.BRANCH_NAME == 'dev' && github.event_name == 'push'
       run: |
-        aws ecs update-service --cluster dev-cluster --service dev-backend-service --force-new-deployment
+        aws ecs update-service --cluster dev-cluster --service dev-backend --force-new-deployment
         
     - name: Wait for service deployment
       if: env.BRANCH_NAME == 'dev' && github.event_name == 'push'
       run: |
         aws ecs wait services-stable \
           --cluster dev-cluster \
-          --services dev-backend-service
+          --services dev-backend
         
         # Verify deployment success
         DEPLOYMENT_STATUS=$(aws ecs describe-services \
           --cluster dev-cluster \
-          --services dev-backend-service \
+          --services dev-backend \
           --query 'services[0].deployments[0].status' \
           --output text)
         
