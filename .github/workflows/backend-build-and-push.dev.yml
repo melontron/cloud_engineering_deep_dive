@@ -67,7 +67,7 @@ jobs:
       BRANCH_NAME: ${{ needs.build-and-push.outputs.branch_name }}
 
     steps:
-     - name: Update ECS service
+    - name: Update ECS service
       if: env.BRANCH_NAME == 'dev' && github.event_name == 'push'
       run: |
         aws ecs update-service \
