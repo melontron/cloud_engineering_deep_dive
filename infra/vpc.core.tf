@@ -88,28 +88,28 @@ resource "aws_route" "core_public_internet_access" {
 }
 
 
-resource "aws_nat_gateway" "core" {
-  count         = local.core_az_count
-  subnet_id     = aws_subnet.core_public[count.index].id
-  allocation_id = aws_eip.core[count.index].id
-  tags = {
-    Name = "${terraform.workspace}-core-ngw-${local.az_suffix[count.index]}"
-  }
-}
+# resource "aws_nat_gateway" "core" {
+#   count         = local.core_az_count
+#   subnet_id     = aws_subnet.core_public[count.index].id
+#   allocation_id = aws_eip.core[count.index].id
+#   tags = {
+#     Name = "${terraform.workspace}-core-ngw-${local.az_suffix[count.index]}"
+#   }
+# }
 
-resource "aws_eip" "core" {
-  count  = local.core_az_count
-  domain = "vpc"
-  tags = {
-    Name = "${terraform.workspace}-core-nat-eip-${local.az_suffix[count.index]}"
-  }
-}
+# resource "aws_eip" "core" {
+#   count  = local.core_az_count
+#   domain = "vpc"
+#   tags = {
+#     Name = "${terraform.workspace}-core-nat-eip-${local.az_suffix[count.index]}"
+#   }
+# }
 
 
-resource "aws_route" "core_private_internet_access" {
-  count                  = local.core_az_count
-  route_table_id         = aws_route_table.core_private[count.index].id
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.core[count.index].id
-}
+# resource "aws_route" "core_private_internet_access" {
+#   count                  = local.core_az_count
+#   route_table_id         = aws_route_table.core_private[count.index].id
+#   destination_cidr_block = "0.0.0.0/0"
+#   nat_gateway_id         = aws_nat_gateway.core[count.index].id
+# }
 
