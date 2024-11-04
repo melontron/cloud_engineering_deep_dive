@@ -53,7 +53,7 @@ resource "aws_ecs_service" "backend" {
   name            = "${terraform.workspace}-backend"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.backend.arn
-  desired_count   = 2
+  desired_count   = 1
 
   capacity_provider_strategy {
     capacity_provider = "FARGATE"
