@@ -71,6 +71,12 @@ resource "aws_ecs_service" "backend" {
     assign_public_ip = false
   }
 
+  load_balancer {
+    target_group_arn = aws_lb_target_group.backend.arn
+    container_name   = "backend"
+    container_port   = 4444
+  }
+
   deployment_circuit_breaker {
     enable   = true
     rollback = true

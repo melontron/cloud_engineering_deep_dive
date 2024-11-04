@@ -73,33 +73,6 @@ resource "aws_lb_target_group" "backend" {
   }
 }
 
-# HTTPS Listener
-resource "aws_lb_listener" "https" {
-  load_balancer_arn = aws_lb.backend.arn
-  port              = 443
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-Ext-FIPS-2020-10"
-  certificate_arn   = aws_acm_certificate.alb.arn
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.backend.arn
-  }
-}
-
-
-resource "aws_acm_certificate" "alb" {
-  domain_name       = "*.elb.amazonaws.com"
-  validation_method = "DNS"
-
-  tags = {
-    Name = "${terraform.workspace}-backend-alb-cert"
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
 
 # HTTP Listener (redirects to HTTPS)
 resource "aws_lb_listener" "http" {
@@ -108,11 +81,7 @@ resource "aws_lb_listener" "http" {
   protocol          = "HTTP"
 
   default_action {
-    type = "redirect"
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.backend.arn
   }
 }
