@@ -7,13 +7,6 @@ on:
     paths:
       - 'src/backend/**'
       - '.github/workflows/backend-build-and-push.dev.yml'
-  pull_request:
-    branches:
-      - dev
-    paths:
-      - 'src/backend/**'
-      - '.github/workflows/backend-build-and-push.dev.yml'
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -63,3 +56,27 @@ jobs:
       run: |
         docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+    
+    - name: Update ECS service
+      if: env.BRANCH_NAME == 'dev' && github.event_name == 'push'
+      run: |
+        aws ecs update-service --cluster dev-cluster --service dev-backend-service --force-new-deployment
+        
+    - name: Wait for service deployment
+      if: env.BRANCH_NAME == 'dev' && github.event_name == 'push'
+      run: |
+        aws ecs wait services-stable \
+          --cluster dev-cluster \
+          --services dev-backend-service
+        
+        # Verify deployment success
+        DEPLOYMENT_STATUS=$(aws ecs describe-services \
+          --cluster dev-cluster \
+          --services dev-backend-service \
+          --query 'services[0].deployments[0].status' \
+          --output text)
+        
+        if [ "$DEPLOYMENT_STATUS" != "PRIMARY" ]; then
+          echo "Deployment failed with status: $DEPLOYMENT_STATUS"
+          exit 1
+        fi
