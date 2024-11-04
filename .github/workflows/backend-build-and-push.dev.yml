@@ -7,6 +7,7 @@ on:
     paths:
       - 'src/backend/**'
       - '.github/workflows/backend-build-and-push.dev.yml'
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -57,6 +58,7 @@ jobs:
       run: |
         docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
@@ -73,33 +75,21 @@ jobs:
         role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.AWS_ROLE_TO_ASSUME }}
         aws-region: us-east-1
         role-session-name: GitHubActionsECRPushSession
-        
-    - name: Update ECS service
-      if: env.BRANCH_NAME == 'dev' && github.event_name == 'push'
-      run: |
-        aws ecs update-service \
-          --cluster dev-cluster \
-          --service dev-backend \
-          --force-new-deployment \
-          --region us-east-1
 
-    - name: Wait for service deployment
+    - name: Update task definition with new image
       if: env.BRANCH_NAME == 'dev' && github.event_name == 'push'
-      run: |
-        aws ecs wait services-stable \
-          --cluster dev-cluster \
-          --services dev-backend \
-          --region us-east-1
+      id: download-taskdef
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ env.BRANCH_NAME }}-backend
+        container-name: backend
+        image: ${{ steps.login-ecr.outputs.registry }}/${{ env.BRANCH_NAME }}-backend-repo:${{ env.BRANCH_NAME }}-${{ github.sha }}
 
-        # Verify deployment success
-        DEPLOYMENT_STATUS=$(aws ecs describe-services \
-          --cluster dev-cluster \
-          --services dev-backend \
-          --region us-east-1 \
-          --query 'services[0].deployments[0].status' \
-          --output text)
-        
-        if [ "$DEPLOYMENT_STATUS" != "PRIMARY" ]; then
-          echo "Deployment failed with status: $DEPLOYMENT_STATUS"
-          exit 1
-        fi
+    - name: Deploy to ECS
+      if: env.BRANCH_NAME == 'dev' && github.event_name == 'push'
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.download-taskdef.outputs.task-definition }}
+        service: ${{ env.BRANCH_NAME }}-backend
+        cluster: ${{ env.BRANCH_NAME }}-cluster
+        wait-for-service-stability: true
