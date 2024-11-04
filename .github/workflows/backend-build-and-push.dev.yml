@@ -76,12 +76,15 @@ jobs:
         aws-region: us-east-1
         role-session-name: GitHubActionsECRPushSession
 
+    - name: Download migration task definition
+      run: aws ecs describe-task-definition --task-definition ${{ env.BRANCH_NAME }}-backend --query taskDefinition > task-definition.json
+
     - name: Update task definition with new image
       if: env.BRANCH_NAME == 'dev' && github.event_name == 'push'
       id: download-taskdef
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
-        task-definition: arn:aws:ecs:us-east-1:${{ secrets.AWS_ACCOUNT_ID }}:task-definition/${{ env.BRANCH_NAME }}-backend
+        task-definition: 'task-definition.json'
         container-name: backend
         image: ${{ steps.login-ecr.outputs.registry }}/${{ env.BRANCH_NAME }}-backend-repo:${{ env.BRANCH_NAME }}-${{ github.sha }}
 
@@ -89,7 +92,7 @@ jobs:
       if: env.BRANCH_NAME == 'dev' && github.event_name == 'push'
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
-        task-definition: ${{ env.BRANCH_NAME }}-backend
+        task-definition: ${{ env.BRANCH_NAME }}-backend/
         service: ${{ env.BRANCH_NAME }}-backend
         cluster: ${{ env.BRANCH_NAME }}-cluster
         wait-for-service-stability: true
