@@ -11,6 +11,9 @@ import { ConstantsModule } from './common/config/constants/constants.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthenticateMiddleware).exclude('/v1').forRoutes('*');
+    consumer
+      .apply(AuthenticateMiddleware)
+      .exclude('/v1', '/health')
+      .forRoutes('*');
   }
 }

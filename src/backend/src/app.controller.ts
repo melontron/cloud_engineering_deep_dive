@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, HttpCode, Header } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
@@ -10,6 +10,17 @@ export class AppController {
     return {
       version: '1.0.0',
       description: 'aca cloud engineering deep dive api',
+    };
+  }
+
+  @Get('health')
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  @Header('Pragma', 'no-cache')
+  @Header('Expires', '0')
+  @HttpCode(200)
+  getHealth(): object {
+    return {
+      status: 'ok',
     };
   }
 }
