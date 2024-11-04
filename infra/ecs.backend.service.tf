@@ -81,6 +81,12 @@ resource "aws_ecs_service" "backend" {
     enable   = true
     rollback = true
   }
+
+  ordered_placement_strategy {
+    type  = "binpack"
+    field = "cpu"
+  }
+
   lifecycle {
     ignore_changes = [task_definition]
   }
