@@ -92,7 +92,7 @@ jobs:
       if: env.BRANCH_NAME == 'dev' && github.event_name == 'push'
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
-        task-definition: ${{ env.BRANCH_NAME }}-backend
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
         service: ${{ env.BRANCH_NAME }}-backend
         cluster: ${{ env.BRANCH_NAME }}-cluster
         wait-for-service-stability: true
