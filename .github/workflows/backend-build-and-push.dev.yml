@@ -7,13 +7,6 @@ on:
     paths:
       - 'src/backend/**'
       - '.github/workflows/backend-build-and-push.dev.yml'
-  pull_request:
-    branches:
-      - dev
-    paths:
-      - 'src/backend/**'
-      - '.github/workflows/backend-build-and-push.dev.yml'
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
