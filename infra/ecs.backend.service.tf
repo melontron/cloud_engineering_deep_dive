@@ -75,6 +75,9 @@ resource "aws_ecs_service" "backend" {
     enable   = true
     rollback = true
   }
+  lifecycle {
+    ignore_changes = [task_definition]
+  }
 }
 
 resource "aws_security_group" "backend" {
