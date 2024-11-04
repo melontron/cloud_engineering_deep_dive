@@ -65,24 +65,30 @@ jobs:
       contents: read
     env:
       BRANCH_NAME: ${{ needs.build-and-push.outputs.branch_name }}
-      
+
     steps:
-    - name: Update ECS service
+     - name: Update ECS service
       if: env.BRANCH_NAME == 'dev' && github.event_name == 'push'
       run: |
-        aws ecs update-service --cluster dev-cluster --service dev-backend --force-new-deployment
-        
+        aws ecs update-service \
+          --cluster dev-cluster \
+          --service dev-backend \
+          --force-new-deployment \
+          --region us-east-1
+
     - name: Wait for service deployment
       if: env.BRANCH_NAME == 'dev' && github.event_name == 'push'
       run: |
         aws ecs wait services-stable \
           --cluster dev-cluster \
-          --services dev-backend
-        
+          --services dev-backend \
+          --region us-east-1
+
         # Verify deployment success
         DEPLOYMENT_STATUS=$(aws ecs describe-services \
           --cluster dev-cluster \
           --services dev-backend \
+          --region us-east-1 \
           --query 'services[0].deployments[0].status' \
           --output text)
         
