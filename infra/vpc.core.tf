@@ -7,16 +7,6 @@ resource "aws_vpc" "core" {
   }
 }
 
-
-# 10.0.0.0   : Network Address (reserved)
-# 10.0.0.1   : VPC Router (reserved)
-# 10.0.0.2   : DNS Server (reserved)
-# 10.0.0.3   : Future Use (reserved)
-# 10.0.0.4   : First usable IP address
-# ...
-# 10.0.0.254 : Last usable IP address
-# 10.0.0.255 : Network Broadcast Address (reserved)
-# Each subnet will have 251 usable IP addresses.
 resource "aws_subnet" "core_private" {
   count             = local.core_az_count
   vpc_id            = aws_vpc.core.id
@@ -27,7 +17,6 @@ resource "aws_subnet" "core_private" {
     Name = "${terraform.workspace}-core-subnet-private-${local.az_suffix[count.index]}"
   }
 }
-
 
 
 resource "aws_subnet" "core_public" {
