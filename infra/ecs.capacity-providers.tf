@@ -29,6 +29,12 @@ resource "aws_iam_role_policy_attachment" "ecs_instance" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 
+# Add ECR access for ECS instances
+resource "aws_iam_role_policy_attachment" "ecs_instance_ecr" {
+  role       = aws_iam_role.ecs_instance.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
 # Instance Profile for EC2 instances
 # Required to assign the IAM role to EC2 instances
 # Allows instances to assume the role and get necessary permissions
@@ -47,7 +53,7 @@ resource "aws_iam_instance_profile" "ecs" {
 resource "aws_launch_template" "ecs" {
   name = "${terraform.workspace}-ecs-lt"
 
-  image_id      = "ami-0c7217cdde317cfec"
+  image_id      = "ami-05df9ff28520b44e8"
   instance_type = "t3.nano"
 
   user_data = base64encode(<<-EOF
@@ -61,10 +67,7 @@ resource "aws_launch_template" "ecs" {
     name = aws_iam_instance_profile.ecs.name
   }
 
-  network_interfaces {
-    associate_public_ip_address = false
-    security_groups             = [aws_security_group.ecs_instances.id]
-  }
+  vpc_security_group_ids = [aws_security_group.ecs_instances.id]
 
   tag_specifications {
     resource_type = "instance"
@@ -98,6 +101,13 @@ resource "aws_security_group" "ecs_instances" {
     security_groups = [aws_security_group.alb.id]
   }
 
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "TCP"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -121,7 +131,7 @@ resource "aws_autoscaling_group" "ecs" {
   vpc_zone_identifier = aws_subnet.core_private[*].id
   health_check_type   = "EC2"
   min_size            = 1
-  max_size            = 4
+  max_size            = 5
   desired_capacity    = 1
 
   launch_template {
@@ -147,13 +157,8 @@ resource "aws_autoscaling_group" "ecs_spot" {
   vpc_zone_identifier = aws_subnet.core_private[*].id
   health_check_type   = "EC2"
   min_size            = 0
-  max_size            = 10
-  desired_capacity    = 1
-
-  launch_template {
-    id      = aws_launch_template.ecs.id
-    version = "$Latest"
-  }
+  max_size            = 0
+  desired_capacity    = 0
 
   mixed_instances_policy {
     instances_distribution {
@@ -167,7 +172,30 @@ resource "aws_autoscaling_group" "ecs_spot" {
         launch_template_id = aws_launch_template.ecs.id
         version            = "$Latest"
       }
+
+      override {
+        instance_type = "t3.nano"
+      }
+      # Add more instance types for better spot availability
+      override {
+        instance_type = "t3.micro"
+      }
+      override {
+        instance_type = "t3a.nano"
+      }
     }
+  }
+
+  # Important: Add instance refresh configuration
+  instance_refresh {
+    strategy = "Rolling"
+    preferences {
+      min_healthy_percentage = 50
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [desired_capacity]
   }
 
   tag {
@@ -193,7 +221,7 @@ resource "aws_ecs_capacity_provider" "ec2" {
       maximum_scaling_step_size = 10
       minimum_scaling_step_size = 1
       status                    = "ENABLED"
-      target_capacity           = 80
+      target_capacity           = 100
     }
   }
 }
@@ -214,7 +242,29 @@ resource "aws_ecs_capacity_provider" "ec2_spot" {
       maximum_scaling_step_size = 10
       minimum_scaling_step_size = 1
       status                    = "ENABLED"
-      target_capacity           = 80
+      target_capacity           = 100
     }
   }
 }
+
+
+
+
+# spin up ec2 intsance in public subnet
+resource "aws_instance" "ecs" {
+  ami                         = "ami-0c7217cdde317cfec"
+  instance_type               = "t3.nano"
+  subnet_id                   = aws_subnet.core_public[0].id
+  key_name                    = aws_key_pair.core_instance_access.key_name
+  associate_public_ip_address = true
+  vpc_security_group_ids      = [aws_security_group.ecs_instances.id]
+}
+
+
+# resource "aws_autoscaling_policy" "scale_out" {
+#   name                   = "${terraform.workspace}-ecs-scale-out"
+#   scaling_adjustment     = 1
+#   adjustment_type        = "ChangeInCapacity"
+#   cooldown               = 300
+#   autoscaling_group_name = aws_autoscaling_group.ecs.name
+# }
