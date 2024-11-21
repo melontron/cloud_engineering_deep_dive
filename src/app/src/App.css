@@ -38,5 +38,72 @@
 }
 
 .read-the-docs {
-  color: #888;
+  color: #0a0a0a;
+}
+
+.app {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.input-container {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group label {
+  margin-bottom: 5px;
+}
+
+.input-group input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.load-test-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.requests-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.requests-table th,
+.requests-table td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ccc;
+}
+
+.requests-table th {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.requests-table tbody tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+.requests-table tbody tr:nth-child(even) {
+  background-color: #f1f1f1;
+}
+
+.requests-table tbody tr td {
+  color: #000;
 }

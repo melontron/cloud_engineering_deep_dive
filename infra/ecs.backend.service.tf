@@ -3,8 +3,8 @@ resource "aws_ecs_task_definition" "backend" {
   family                   = "${terraform.workspace}-backend"
   requires_compatibilities = ["EC2"]
   network_mode             = "awsvpc"
-  cpu                      = 256
-  memory                   = 256
+  cpu                      = 512
+  memory                   = 512
   execution_role_arn       = aws_iam_role.ecs_task_execution.arn
   task_role_arn            = aws_iam_role.ecs_task.arn
 
@@ -12,8 +12,8 @@ resource "aws_ecs_task_definition" "backend" {
   container_definitions = jsonencode([
     {
       name      = "backend"
-      cpu       = 256
-      memory    = 256
+      cpu       = 512
+      memory    = 512
       image     = "${aws_ecr_repository.backend_repos.repository_url}:latest"
       essential = true
       portMappings = [

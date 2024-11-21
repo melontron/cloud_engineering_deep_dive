@@ -23,4 +23,38 @@ export class AppController {
       status: 'ok',
     };
   }
+
+  @Get('run')
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  @Header('Pragma', 'no-cache')
+  @Header('Expires', '0')
+  consumeCpu(): object {
+    const startTime = Date.now();
+    const duration = 1000;
+
+    // Function to check if a number is prime
+    const isPrime = (num: number): boolean => {
+      for (let i = 2; i <= Math.sqrt(num); i++) {
+        if (num % i === 0) {
+          return false;
+        }
+      }
+      return num > 1;
+    };
+
+    // Generate CPU load by finding prime numbers
+    let count = 0;
+    let num = 2;
+    while (Date.now() - startTime < duration) {
+      if (isPrime(num)) {
+        count++;
+      }
+      num++;
+    }
+
+    return {
+      status: 'ok',
+      message: `Found ${count} prime numbers in ${duration} milliseconds`,
+    };
+  }
 }

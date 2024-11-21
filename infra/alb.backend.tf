@@ -85,3 +85,55 @@ resource "aws_lb_listener" "http" {
     target_group_arn = aws_lb_target_group.backend.arn
   }
 }
+
+
+
+# resource "aws_iam_role" "runner_role" {
+#   name = "main-backend-runner-role"
+
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Action = "sts:AssumeRoleWithWebIdentity"
+#         Effect = "Allow"
+#         Principal = {
+#           Federated = "arn:aws:iam::072468034689:oidc-provider/token.actions.githubusercontent.com"
+#         }
+#         Condition = {
+#           StringEquals = {
+#             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+#           }
+#           StringLike = {
+#             "token.actions.githubusercontent.com:sub" = "repo:melontron/cloud_engineering_deep_dive:*"
+#           }
+#         }
+#       },
+#     ]
+#   })
+# }
+
+# Attach the policy to the role 
+# resource "aws_iam_role_policy_attachment" "runner_policy_attachment" {
+#   role       = aws_iam_role.runner_role.name
+#   policy_arn = aws_iam_policy.runner_policy.arn
+# }
+
+
+# IAM Policy for the runner
+# resource "aws_iam_policy" "runner_policy" {
+#   name        = "runner-policy"
+#   path        = "/"
+#   description = "Policy for runner EC2 instance"
+
+#   policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Action   = "*"
+#         Effect   = "Allow"
+#         Resource = "*"
+#       },
+#     ]
+#   })
+# }
