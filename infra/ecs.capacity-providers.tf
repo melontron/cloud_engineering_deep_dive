@@ -54,7 +54,7 @@ resource "aws_launch_template" "ecs" {
   name = "${terraform.workspace}-ecs-lt"
 
   image_id      = "ami-05df9ff28520b44e8"
-  instance_type = "t3.nano"
+  instance_type = "t3.small"
 
   user_data = base64encode(<<-EOF
     #!/bin/bash

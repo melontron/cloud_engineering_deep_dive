@@ -13,7 +13,7 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthenticateMiddleware)
-      .exclude('/v1', '/health')
+      .exclude('/v1', '/health', '/run')
       .forRoutes('*');
   }
 }
