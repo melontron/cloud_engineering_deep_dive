@@ -30,7 +30,7 @@ export class AppController {
   @Header('Expires', '0')
   consumeCpu(): object {
     const startTime = Date.now();
-    const duration = 10000;
+    const duration = 1000;
 
     // Function to check if a number is prime
     const isPrime = (num: number): boolean => {
