@@ -76,3 +76,6 @@ main/terraform.rc
 
 .DS_Store
 .history
+src/lambdas/*/dist/*
+src/lambdas/*/layer/nodejs/node_modules/*
+src/lambdas/*/layer/dist/*

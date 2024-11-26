@@ -1,8 +1,8 @@
 const axios = require('axios');
 
-const BASE_URL = 'http://localhost:4444'; 
-const CONCURRENT_REQUESTS = 10; 
-const REQUEST_INTERVAL = 10000; 
+const BASE_URL = 'http://dev-backend-alb-1236518368.us-east-1.elb.amazonaws.com'; 
+const CONCURRENT_REQUESTS = 6; 
+const REQUEST_INTERVAL = 1000; 
 
 const makeRequest = async () => {
   try {
